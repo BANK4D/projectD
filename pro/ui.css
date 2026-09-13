@@ -1,0 +1,125 @@
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap');
+
+:root {
+    --vct-dark: #0f1419;
+    --vct-card-bg: rgba(25, 30, 38, 0.7);
+    --vct-red: #ff4655;
+    --vct-red-hover: #e53e4c;
+    --vct-glow: 0 0 15px rgba(255, 70, 85, 0.4);
+}
+
+body {
+    font-family: 'Kanit', sans-serif;
+    background-color: var(--vct-dark);
+    color: #f3f4f6;
+    overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #090c0e;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--vct-red);
+    border-radius: 4px;
+}
+
+/* Navbar */
+.navbar {
+    background-color: rgba(15, 20, 25, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid rgba(255, 70, 85, 0.2);
+}
+
+.nav-link {
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--vct-red) !important;
+    text-shadow: 0 0 8px rgba(255, 70, 85, 0.6);
+}
+
+/* Glowing Button */
+.btn-vct {
+    background: var(--vct-red);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 24px;
+    box-shadow: var(--vct-glow);
+    transition: 0.3s all ease;
+    text-transform: uppercase;
+}
+
+.btn-vct:hover {
+    background: var(--vct-red-hover);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(255, 70, 85, 0.7);
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(15, 20, 25, 1) 100%),
+                url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+    background-size: cover;
+    padding: 140px 0 80px;
+    border-bottom: 3px solid var(--vct-red);
+}
+
+/* Live Ticker */
+.match-ticker {
+    background: #090c0e;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.85rem;
+}
+
+/* Modern Card with Glass Effect & Glowing Hover */
+.vct-card {
+    background: var(--vct-card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(5px);
+    border-radius: 8px;
+    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    overflow: hidden;
+}
+
+.vct-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--vct-red);
+    box-shadow: var(--vct-glow);
+}
+
+.vct-card img {
+    transition: 0.5s ease;
+}
+
+.vct-card:hover img {
+    transform: scale(1.05);
+}
+
+.badge-vct {
+    background-color: var(--vct-red);
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+/* Neon Badge Live */
+.badge-live {
+    background-color: #ff0055;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}

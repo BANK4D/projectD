@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MATCHFOUND - Find Your Gaming Friends</title>
+
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+
+    html { scroll-behavior: smooth; }
+
+    :root {
+        --bg: #0b0d13;
+        --bg-nav: #11141d;
+        --bg-card: #151925;
+        --bg-card-alt: #1c2030;
+        --bg-input: #0f121a;
+        --border: #292e40;
+        --text: #ffffff;
+        --text-secondary: #aaaaaa;
+        --text-muted: #888888;
+        --accent: #7c5cff;
+        --accent-hover: #6848ef;
+        --accent-soft: #24203f;
+        --accent-soft-text: #a99cff;
+        --success: #6ee7a8;
+        --shadow: rgba(0,0,0,0.4);
+    }
+
+    [data-theme="light"] {
+        --bg: #f4f5fa;
+        --bg-nav: #ffffff;
+        --bg-card: #ffffff;
+        --bg-card-alt: #f0f1f8;
+        --bg-input: #f7f8fc;
+        --border: #e1e3ee;
+        --text: #14161f;
+        --text-secondary: #5b5f72;
+        --text-muted: #8a8fa3;
+        --accent: #7c5cff;
+        --accent-hover: #6848ef;
+        --accent-soft: #ece9ff;
+        --accent-soft-text: #6848ef;
+        --success: #16915f;
+        --shadow: rgba(20,22,31,0.12);
+    }
+
+    body { background: var(--bg); color: var(--text); transition: background .25s ease, color .25s ease; }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* ================= NAVBAR ================= */
+
+    nav {
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 7%;
+        background: var(--bg-nav);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        transition: background .25s ease, border-color .25s ease;
+    }
+
+    .logo { font-size: 25px; font-weight: bold; color: var(--accent); }
+    .logo span { color: var(--text); }
+
+    .nav-links { display: flex; gap: 30px; list-style: none; }
+    .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 15px; }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+    .login-btn {
+        background: var(--accent); color: white; border: none;
+        padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px;
+    }
+    .login-btn:hover { background: var(--accent-hover); }
+
+    .icon-btn {
+        width: 40px; height: 40px;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--bg-card-alt);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        color: var(--text);
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .hamburger-btn { display: none; }
+
+    .profile-chip-wrap { position: relative; }
+    .profile-chip {
+        display: flex; align-items: center; gap: 8px;
+        background: var(--bg-card-alt); border: 1px solid var(--border);
+        color: var(--text); padding: 6px 14px 6px 6px; border-radius: 30px; cursor: pointer; font-size: 14px;
+    }
+    .chip-avatar {
+        width: 28px; height: 28px; border-radius: 50%; background: var(--accent);
+        display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+    .profile-dropdown {
+        display: none; flex-direction: column;
+        position: absolute; right: 0; top: calc(100% + 8px);
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+        overflow: hidden; min-width: 180px; box-shadow: 0 10px 30px var(--shadow); z-index: 200;
+    }
+    .profile-dropdown.open { display: flex; }
+    .profile-dropdown button {
+        background: none; border: none; color: var(--text); text-align: left;
+        padding: 12px 16px; cursor: pointer; font-size: 14px;
+    }
+    .profile-dropdown button:hover { background: var(--bg-card-alt); }
+
+    .mobile-menu {
+        display: none; flex-direction: column; gap: 14px;
+        background: var(--bg-nav); border-bottom: 1px solid var(--border);
+        padding: 18px 7%;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: var(--text-secondary); text-decoration: none; font-size: 15px; }
+
+    /* ================= HERO ================= */
+
+    .hero {
+        min-height: 500px;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 70px 8%;
+        background:
+            radial-gradient(circle at 80% 30%, #33217c 0%, transparent 35%),
+            radial-gradient(circle at 20% 80%, #16234b 0%, transparent 35%),
+            var(--bg);
+    }
+    [data-theme="light"] .hero {
+        background:
+            radial-gradient(circle at 80% 30%, #e4dbff 0%, transparent 40%),
+            radial-gradient(circle at 20% 80%, #dbe6ff 0%, transparent 40%),
+            var(--bg);
+    }
+
+    .hero-text { max-width: 600px; }
+    .hero-small { color: var(--accent); font-weight: bold; letter-spacing: 2px; margin-bottom: 15px; font-size: 14px; }
+    .hero h1 { font-size: 60px; line-height: 1.05; margin-bottom: 20px; }
+    .hero h1 span { color: var(--accent); }
+    .hero p { color: var(--text-secondary); font-size: 18px; line-height: 1.7; margin-bottom: 30px; }
+
+    .hero-btn {
+        background: var(--accent); border: none; color: white;
+        padding: 14px 25px; border-radius: 10px; font-size: 16px; cursor: pointer;
+    }
+    .hero-btn:hover { background: var(--accent-hover); }
+
+    .hero-card {
+        width: 330px; background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: 20px; padding: 25px; box-shadow: 0 20px 60px var(--shadow);
+        animation: heroCardIn .6s ease both;
+    }
+    @keyframes heroCardIn { from { opacity:0; transform: translateY(16px) scale(.97);} to { opacity:1; transform:none; } }
+
+    .match-title { color: var(--text-secondary); font-size: 14px; }
+    .match-number { font-size: 55px; font-weight: bold; color: var(--accent); margin: 10px 0; }
+    .match-user { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--bg-card-alt); border-radius: 12px; }
+    .avatar {
+        width: 50px; height: 50px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--accent); font-weight: bold;
+    }
+
+    /* ================= SECTION ================= */
+
+    section { padding: 70px 8%; }
+    .section-title { text-align: center; margin-bottom: 40px; }
+    .section-title h2 { font-size: 35px; margin-bottom: 10px; }
+    .section-title p { color: var(--text-muted); }
+
+    .reset-filters-btn {
+        margin-top: 14px; background: transparent; border: 1px solid var(--border);
+        color: var(--text-secondary); padding: 8px 16px; border-radius: 8px;
+        cursor: pointer; font-size: 13px;
+    }
+    .reset-filters-btn:hover { border-color: var(--accent); color: var(--text); }
+
+    /* ================= FIND ================= */
+
+    .find-box { max-width: 1100px; margin: auto; background: var(--bg-card); border: 1px solid var(--border); padding: 30px; border-radius: 18px; }
+
+    .filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .filter label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; }
+
+    select, input[type="text"], input[type="password"], textarea {
+        width: 100%; padding: 13px; background: var(--bg-input); color: var(--text);
+        border: 1px solid var(--border); border-radius: 8px; font-size: 14px;
+    }
+    textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+
+    .find-btn {
+        width: 100%; margin-top: 25px; padding: 14px; background: var(--accent);
+        border: none; color: white; font-size: 16px; border-radius: 9px; cursor: pointer;
+    }
+    .find-btn:hover { background: var(--accent-hover); }
+
+    /* ================= PLAYERS ================= */
+
+    .players { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+
+    .player-card {
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+        padding: 25px; transition: transform .2s, border-color .2s; animation: cardIn .3s ease both;
+    }
+    @keyframes cardIn { from { opacity:0; transform: translateY(8px);} to { opacity:1; transform:none; } }
+    .player-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+    .player-top { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .player-avatar {
+        width: 60px; height: 60px; border-radius: 50%; background: var(--bg-card-alt);
+        display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .player-name { font-size: 18px; font-weight: bold; }
+    .online { font-size: 12px; color: var(--success); margin-top: 5px; }
+
+    .game { color: var(--accent); margin-bottom: 10px; }
+    .rank {
+        display: inline-block; background: var(--accent-soft); color: var(--accent-soft-text);
+        padding: 6px 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px;
+    }
+    .style { color: var(--text-secondary); font-size: 14px; margin-bottom: 12px; }
+    .great-match { display: inline-block; font-size: 12px; color: var(--success); margin-bottom: 12px; }
+
+    .match { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .match-percent { color: var(--success); font-size: 20px; font-weight: bold; }
+
+    .card-btn {
+        width: 100%; padding: 10px; border: 1px solid var(--border); background: transparent;
+        color: var(--text); border-radius: 8px; cursor: pointer; font-size: 14px;
+    }
+    .card-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .card-btn.added { background: var(--accent-soft); color: var(--accent-soft-text); border-color: var(--accent); }
+
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-state h3 { color: var(--text); margin-bottom: 8px; }
+
+    /* ================= CHAT ================= */
+
+    .chat-section { background: var(--bg-nav); transition: background .25s ease; }
+
+    .chat-container {
+        max-width: 900px; margin: auto; display: grid; grid-template-columns: 250px 1fr;
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 15px;
+        overflow: hidden; min-height: 440px;
+    }
+
+    .chat-list { border-right: 1px solid var(--border); padding: 20px; }
+    .chat-list h3 { margin-bottom: 20px; }
+    .chat-user { padding: 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-size: 14px; }
+    .chat-user:hover { background: var(--bg-card-alt); }
+    .chat-user.active { background: var(--accent-soft); color: var(--accent-soft-text); }
+
+    .chat-window { display: flex; flex-direction: column; }
+    .chat-header { padding: 18px; border-bottom: 1px solid var(--border); font-weight: bold; }
+
+    .messages { flex: 1; padding: 20px; overflow-y: auto; max-height: 360px; }
+    .message { background: var(--bg-card-alt); display: inline-block; padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; max-width: 80%; font-size: 14px; }
+    .message.me { display: block; width: fit-content; margin-left: auto; background: var(--accent); color: #fff; }
+
+    .typing { display: inline-flex; gap: 4px; padding: 12px 16px; background: var(--bg-card-alt); border-radius: 10px; margin-bottom: 10px; }
+    .typing span { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: blink 1.2s infinite ease-in-out; }
+    .typing span:nth-child(2) { animation-delay: .2s; }
+    .typing span:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink { 0%, 80%, 100% { opacity: .2; } 40% { opacity: 1; } }
+
+    .chat-input { display: flex; gap: 10px; padding: 15px; border-top: 1px solid var(--border); }
+    .chat-input input {
+        flex: 1; padding: 12px; background: var(--bg-input); border: 1px solid var(--border);
+        color: var(--text); border-radius: 8px;
+    }
+    .chat-input button { background: var(--accent); border: none; color: white; padding: 0 20px; border-radius: 8px; cursor: pointer; }
+    .chat-input button:hover { background: var(--accent-hover); }
+
+    /* ================= MODALS ================= */
+
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,.6);
+        display: none; align-items: center; justify-content: center;
+        z-index: 1000; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px;
+        max-width: 440px; width: 100%; padding: 32px; max-height: 90vh; overflow-y: auto; position: relative;
+    }
+    .modal-box h2 { margin-bottom: 6px; }
+    .modal-box .modal-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 22px; }
+
+    .modal-close {
+        position: absolute; top: 18px; right: 18px; background: none; border: none;
+        color: var(--text-muted); font-size: 20px; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    .auth-tabs { display: flex; gap: 10px; margin-bottom: 22px; border-bottom: 1px solid var(--border); }
+    .auth-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; font-size: 15px; }
+    .auth-tab.active { color: var(--text); border-color: var(--accent); }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; }
+
+    .btn-primary {
+        width: 100%; padding: 14px; background: var(--accent); border: none; color: white;
+        font-size: 15px; border-radius: 9px; cursor: pointer; margin-top: 6px;
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .avatar-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+    .avatar-option {
+        width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--border);
+        background: var(--bg-card-alt); font-size: 18px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .avatar-option.selected { border-color: var(--accent); background: var(--accent-soft); }
+
+    .demo-hint { font-size: 12px; color: var(--text-muted); margin-top: -8px; margin-bottom: 16px; }
+
+    /* ================= TOASTS ================= */
+
+    .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; }
+    .toast {
+        background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+        color: var(--text); padding: 12px 18px; border-radius: 10px; box-shadow: 0 10px 30px var(--shadow);
+        font-size: 14px; max-width: 300px; animation: toastIn .25s ease;
+    }
+    .toast.success { border-left-color: var(--success); }
+    .toast.hide { opacity: 0; transform: translateX(20px); transition: .3s; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: none; } }
+
+    /* ================= FOOTER ================= */
+
+    footer { text-align: center; padding: 30px; color: var(--text-muted); border-top: 1px solid var(--border); }
+
+    /* ================= RESPONSIVE ================= */
+
+    @media (max-width: 1100px) {
+        .filters { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+        .hero { flex-direction: column; text-align: center; gap: 40px; }
+        .hero h1 { font-size: 45px; }
+        .filters { grid-template-columns: 1fr; }
+        .players { grid-template-columns: 1fr; }
+        .nav-links { display: none; }
+        .hamburger-btn { display: flex; }
+        .chat-container { grid-template-columns: 1fr; }
+        .chat-list { display: none; }
+    }
+</style>
+    <!-- Socket.io for real-time chat -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav>
+    <div class="logo">MATCH<span>FOUND</span></div>
+
+    <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#find">Find Players</a></li>
+        <li><a href="#players">Players</a></li>
+        <li><a href="#chat">Chat</a></li>
+    </ul>
+
+    <div class="nav-actions">
+        <button id="themeToggle" class="icon-btn" aria-label="สลับเป็นธีมสว่าง" onclick="toggleTheme()">🌙</button>
+        <div id="authArea"></div>
+        <button id="hamburgerBtn" class="icon-btn hamburger-btn" aria-label="เมนู" onclick="toggleMobileMenu()">☰</button>
+    </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#home" onclick="toggleMobileMenu()">Home</a>
+    <a href="#find" onclick="toggleMobileMenu()">Find Players</a>
+    <a href="#players" onclick="toggleMobileMenu()">Players</a>
+    <a href="#chat" onclick="toggleMobileMenu()">Chat</a>
+    <div id="mobileAuthArea"></div>
+</div>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero" id="home">
+    <div class="hero-text">
+        <div class="hero-small" id="heroGreeting">GAMING FRIEND FINDER</div>
+
+        <h1>FIND YOUR<br>PERFECT <span>DUO.</span></h1>
+
+        <p>
+            หาเพื่อนเล่นเกมที่เข้ากับคุณ ไม่ใช่แค่เล่นเกมเดียวกัน
+            แต่มี Rank และสไตล์การเล่นที่ใกล้เคียงกัน
+        </p>
+
+        <button class="hero-btn" onclick="document.getElementById('find').scrollIntoView({behavior:'smooth'})">
+            🔍 Find Your Match
+        </button>
+    </div>
+
+    <div class="hero-card">
+        <div class="match-title">YOUR BEST MATCH</div>
+        <div class="match-number">96%</div>
+        <div class="match-user">
+            <div class="avatar">R</div>
+            <div>
+                <strong>Reo</strong>
+                <div style="color:var(--text-secondary); font-size:13px;">Valorant • Immortal</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ================= FIND PLAYERS ================= -->
+
+<section id="find">
+    <div class="section-title">
+        <h2>Find Your Match</h2>
+        <p>เลือกเกมและ Rank ที่คุณเล่น แล้วค้นหาเพื่อนที่เหมาะกับคุณ</p>
+    </div>
+
+    <div class="find-box">
+        <div class="filters">
+            <div class="filter">
+                <label for="game">🎮 Game</label>
+                <select id="game" onchange="changeRank()">
+                    <option value="all">ทุกเกม</option>
+                    <option value="valorant">Valorant</option>
+                    <option value="lol">League of Legends</option>
+                    <option value="pubg">PUBG</option>
+                    <option value="overwatch">Overwatch 2</option>
+                </select>
+            </div>
+
+            <div class="filter">
+                <label for="rank">🏆 Rank</label>
+                <select id="rank"><!-- JavaScript ใส่ Rank --></select>
+            </div>
+
+            <div class="filter">
+                <label for="style">🎯 Play Style</label>
+                <select id="style">
+                    <option value="all">ทุกสไตล์</option>
+                    <option value="Competitive">Competitive</option>
+                    <option value="Casual">Casual</option>
+                    <option value="Chill">Chill</option>
+                    <option value="Rank Up">Rank Up</option>
+                </select>
+            </div>
+
+            <div class="filter">
+                <label for="searchName">🔎 ชื่อผู้เล่น</label>
+                <input type="text" id="searchName" placeholder="พิมพ์ชื่อผู้เล่น..."
+                       onkeydown="if(event.key==='Enter'){event.preventDefault(); findPlayers();}">
+            </div>
+        </div>
+
+        <button class="find-btn" onclick="findPlayers()">🔍 FIND PLAYERS</button>
+    </div>
+</section>
+
+
+<!-- ================= PLAYERS ================= -->
+
+<section id="players">
+    <div class="section-title">
+        <h2>Players You May Like</h2>
+        <p id="playersSubtitle">ผู้เล่นที่มีเกมและ Rank ใกล้เคียงกับคุณ</p>
+        <button id="resetFiltersBtn" class="reset-filters-btn" style="display:none;" onclick="resetFilters()">
+            ✕ ล้างตัวกรอง แสดงผู้เล่นทั้งหมด
+        </button>
+    </div>
+
+    <div class="players" id="playersGrid"><!-- JavaScript render การ์ดผู้เล่น --></div>
+</section>
+
+
+<!-- ================= CHAT ================= -->
+
+<section class="chat-section" id="chat">
+    <div class="section-title">
+        <h2>💬 Chat</h2>
+        <p>คุยกับเพื่อนที่คุณเจอผ่าน MATCHFOUND</p>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-list">
+            <h3>Messages</h3>
+            <div id="chatList"><!-- JavaScript render รายชื่อแชท --></div>
+        </div>
+
+        <div class="chat-window">
+            <div class="chat-header" id="chatHeader">💬 Kira</div>
+
+            <div class="messages" id="messages"><!-- JavaScript render ข้อความ --></div>
+
+            <div class="chat-input">
+                <input id="messageInput" type="text" placeholder="พิมพ์ข้อความ..."
+                       onkeydown="if(event.key==='Enter'){event.preventDefault(); sendMessage();}">
+                <button onclick="sendMessage()" aria-label="ส่งข้อความ">➤</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+    MATCHFOUND © 2026
+    <br>
+    Find gamers. Make friends. Play together.
+</footer>
+
+
+<!-- ================= AUTH MODAL ================= -->
+
+<div class="modal-overlay" id="authModal" onclick="if(event.target===this) closeModal('authModal')">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('authModal')" aria-label="ปิด">✕</button>
+
+        <div class="auth-tabs">
+            <button type="button" class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">เข้าสู่ระบบ</button>
+            <button type="button" class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">สมัครสมาชิก</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <h2 style="margin-bottom:4px;">ยินดีต้อนรับกลับมา</h2>
+            <p class="modal-sub">เข้าสู่ระบบเพื่อจัดการโปรไฟล์และเพื่อนของคุณ</p>
+            <p class="demo-hint">ลองใช้บัญชีทดลอง: <strong>demo</strong> / <strong>demo123</strong></p>
+
+            <div class="form-group">
+                <label for="loginUsername">ชื่อผู้ใช้</label>
+                <input type="text" id="loginUsername" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">รหัสผ่าน</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+
+            <button type="submit" class="btn-primary">เข้าสู่ระบบ</button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="registerForm" onsubmit="handleRegister(event)" style="display:none;">
+            <h2 style="margin-bottom:4px;">สร้างโปรไฟล์นักเล่นเกม</h2>
+            <p class="modal-sub">บอกเราเกี่ยวกับสไตล์การเล่นของคุณ</p>
+
+            <div class="form-group">
+                <label for="regDisplayName">ชื่อที่แสดง</label>
+                <input type="text" id="regDisplayName" required>
+            </div>
+            <div class="form-group">
+                <label for="regUsername">ชื่อผู้ใช้</label>
+                <input type="text" id="regUsername" required>
+            </div>
+            <div class="form-group">
+                <label for="regPassword">รหัสผ่าน</label>
+                <input type="password" id="regPassword" required>
+            </div>
+            <div class="form-group">
+                <label for="regGame">เกมหลัก</label>
+                <select id="regGame" onchange="changeRegRank()">
+                    <option value="valorant">Valorant</option>
+                    <option value="lol">League of Legends</option>
+                    <option value="pubg">PUBG</option>
+                    <option value="overwatch">Overwatch 2</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="regRank">Rank</label>
+                <select id="regRank"></select>
+            </div>
+
+            <button type="submit" class="btn-primary">สร้างบัญชี</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- ================= PROFILE MODAL ================= -->
+
+<div class="modal-overlay" id="profileModal" onclick="if(event.target===this) closeModal('profileModal')">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('profileModal')" aria-label="ปิด">✕</button>
+
+        <h2 style="margin-bottom:4px;">โปรไฟล์ของฉัน</h2>
+        <p class="modal-sub">แก้ไขข้อมูลที่คนอื่นจะเห็นเวลาค้นหาเพื่อนเล่น</p>
+
+        <form onsubmit="handleProfileSave(event)">
+            <div class="form-group">
+                <label>อวาตาร์</label>
+                <div class="avatar-picker" id="avatarPicker">
+                    <button type="button" class="avatar-option" data-avatar="🎮" onclick="selectAvatar(this)">🎮</button>
+                    <button type="button" class="avatar-option" data-avatar="🔥" onclick="selectAvatar(this)">🔥</button>
+                    <button type="button" class="avatar-option" data-avatar="⚡" onclick="selectAvatar(this)">⚡</button>
+                    <button type="button" class="avatar-option" data-avatar="🌙" onclick="selectAvatar(this)">🌙</button>
+                    <button type="button" class="avatar-option" data-avatar="🎯" onclick="selectAvatar(this)">🎯</button>
+                    <button type="button" class="avatar-option" data-avatar="🚀" onclick="selectAvatar(this)">🚀</button>
+                    <button type="button" class="avatar-option" data-avatar="👾" onclick="selectAvatar(this)">👾</button>
+                    <button type="button" class="avatar-option" data-avatar="🐉" onclick="selectAvatar(this)">🐉</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="profDisplayName">ชื่อที่แสดง</label>
+                <input type="text" id="profDisplayName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="profGame">เกมหลัก</label>
+                <select id="profGame" onchange="changeProfileRank()">
+                    <option value="valorant">Valorant</option>
+                    <option value="lol">League of Legends</option>
+                    <option value="pubg">PUBG</option>
+                    <option value="overwatch">Overwatch 2</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="profRank">Rank</label>
+                <select id="profRank"></select>
+            </div>
+
+            <div class="form-group">
+                <label for="profStyle">Play Style</label>
+                <select id="profStyle">
+                    <option value="Competitive">Competitive</option>
+                    <option value="Casual">Casual</option>
+                    <option value="Chill">Chill</option>
+                    <option value="Rank Up">Rank Up</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="profBio">แนะนำตัวสั้นๆ</label>
+                <textarea id="profBio" placeholder="เล่นเกมอะไร ชอบเล่นตำแหน่งไหน ว่างช่วงไหน..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary">บันทึกโปรไฟล์</button>
+        </form>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+
+<script>
+
+    /* =========================================
+       API & SOCKET.IO CONFIG
+    ========================================= */
+
+    const API_URL = "http://localhost:5000/api";
+    let socket = null;
+    let jwtToken = null;
+
+    // Initialize Socket.io connection
+    function initSocket() {
+        socket = io("http://localhost:5000", {
+            auth: {
+                token: jwtToken
+            }
+        });
+
+        socket.on("connect", function () {
+            console.log("✅ Connected to chat server");
+        });
+
+        socket.on("receive_message", function (data) {
+            if (chats[activeChat]) {
+                chats[activeChat].messages.push({ from: "them", text: data.message });
+                renderChatWindow();
+            }
+        });
+
+        socket.on("disconnect", function () {
+            console.log("❌ Disconnected from chat server");
+        });
+    }
+
+    // Get JWT token from localStorage
+    function getToken() {
+        return localStorage.getItem("jwtToken");
+    }
+
+    // Set JWT token to localStorage
+    function setToken(token) {
+        localStorage.setItem("jwtToken", token);
+        jwtToken = token;
+    }
+
+    // Fetch with JWT token
+    async function apiCall(endpoint, options = {}) {
+        const headers = {
+            "Content-Type": "application/json",
+            ...options.headers
+        };
+        
+        if (jwtToken) {
+            headers.Authorization = `Bearer ${jwtToken}`;
+        }
+
+        const response = await fetch(API_URL + endpoint, {
+            ...options,
+            headers
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || data.message || "API Error");
+        }
+        return data;
+    }
+
+    /* =========================================
+       DATA
+    ========================================= */
+
+    const gameNames = {
+        valorant: "Valorant",
+        lol: "League of Legends",
+        pubg: "PUBG",
+        overwatch: "Overwatch 2"
+    };
+
+    const gameRanks = {
+        valorant: ["Iron","Bronze","Silver","Gold","Platinum","Diamond","Ascendant","Immortal","Radiant"],
+        lol: ["Iron","Bronze","Silver","Gold","Platinum","Emerald","Diamond","Master","Grandmaster","Challenger"],
+        pubg: ["Bronze","Silver","Gold","Platinum","Diamond","Master"],
+        overwatch: ["Bronze","Silver","Gold","Platinum","Diamond","Master","Grandmaster","Champion"]
+    };
+
+    const rankEmoji = {
+        Iron:"🔩", Bronze:"🥉", Silver:"🥈", Gold:"🥇", Platinum:"💠", Diamond:"💎",
+        Ascendant:"🔺", Immortal:"🔥", Radiant:"✨", Emerald:"💚", Master:"👑",
+        Grandmaster:"🌟", Challenger:"🏆", Champion:"🏆"
+    };
+
+    const styleEmoji = { "Competitive":"🎯", "Casual":"😎", "Chill":"🌙", "Rank Up":"📈" };
+
+    const players = [
+        { id:1,  name:"Kira",  avatar:"K", gameKey:"valorant",  rank:"Diamond",  style:"Competitive", online:true,  match:94 },
+        { id:2,  name:"Minty", avatar:"M", gameKey:"lol",       rank:"Emerald",  style:"Rank Up",     online:true,  match:89 },
+        { id:3,  name:"Zero",  avatar:"Z", gameKey:"pubg",      rank:"Platinum", style:"Casual",      online:false, match:82 },
+        { id:4,  name:"Nova",  avatar:"N", gameKey:"overwatch", rank:"Master",   style:"Competitive", online:true,  match:91 },
+        { id:5,  name:"Reo",   avatar:"R", gameKey:"valorant",  rank:"Immortal", style:"Rank Up",     online:true,  match:96 },
+        { id:6,  name:"Suki",  avatar:"S", gameKey:"lol",       rank:"Diamond",  style:"Chill",       online:false, match:78 },
+        { id:7,  name:"Bami",  avatar:"B", gameKey:"pubg",      rank:"Diamond",  style:"Competitive", online:true,  match:85 },
+        { id:8,  name:"Yuki",  avatar:"Y", gameKey:"overwatch", rank:"Diamond",  style:"Chill",       online:true,  match:88 },
+        { id:9,  name:"Tor",   avatar:"T", gameKey:"valorant",  rank:"Gold",     style:"Casual",      online:false, match:70 },
+        { id:10, name:"Loki",  avatar:"L", gameKey:"lol",       rank:"Master",   style:"Competitive", online:true,  match:93 }
+    ];
+
+    const friendRequests = new Set();
+
+    const botReplies = [
+        "โอเคเลย! กี่โมงดี?",
+        "งั้นเดี๋ยวเปิดปาร์ตี้รอนะ",
+        "555 วันนี้ฟอร์มดีป่าว",
+        "เล่นสายไหนอยู่ตอนนี้?",
+        "ได้ๆ รอแป๊บนึง กำลังจบเกมอยู่",
+        "จัดไปเลย! พร้อมตลอด",
+        "แรงค์ขึ้นหรือยัง อัปเดตหน่อย",
+        "เดี๋ยวโหลดเกมก่อนนะ รอสักครู่"
+    ];
+
+    const chats = {
+        kira:  { name:"Kira",  avatar:"K", online:true,  messages:[
+            {from:"them", text:"หวัดดี เล่น Valorant ไหม?"},
+            {from:"me",   text:"เล่นครับ Diamond"},
+            {from:"them", text:"งั้นมาเล่นด้วยกันไหม?"}
+        ]},
+        minty: { name:"Minty", avatar:"M", online:true,  messages:[
+            {from:"them", text:"พรุ่งนี้เล่น LoL ไหม เก็บแรงค์กัน"}
+        ]},
+        zero:  { name:"Zero",  avatar:"Z", online:false, messages:[
+            {from:"them", text:"ตอนนี้ไม่ว่างว่ะ เดี๋ยวทักไปนะ"}
+        ]}
+    };
+
+    let activeChat = "kira";
+    let currentTheme = "dark";
+    let currentUser = null;
+    let selectedAvatar = "🎮";
+    const defaultGreeting = "GAMING FRIEND FINDER";
+
+    const users = [
+        { username:"demo", password:"demo123", displayName:"Demo Player", avatar:"🎮",
+          game:"valorant", rank:"Diamond", style:"Competitive", bio:"บัญชีทดลองสำหรับเดโม" }
+    ];
+
+
+    /* =========================================
+       THEME
+    ========================================= */
+
+    function toggleTheme() {
+        currentTheme = currentTheme === "dark" ? "light" : "dark";
+        if (currentTheme === "light") {
+            document.documentElement.setAttribute("data-theme", "light");
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+        }
+        const btn = document.getElementById("themeToggle");
+        btn.textContent = currentTheme === "dark" ? "🌙" : "☀️";
+        btn.setAttribute("aria-label", currentTheme === "dark" ? "สลับเป็นธีมสว่าง" : "สลับเป็นธีมมืด");
+    }
+
+
+    /* =========================================
+       MOBILE MENU
+    ========================================= */
+
+    function toggleMobileMenu() {
+        document.getElementById("mobileMenu").classList.toggle("open");
+    }
+
+
+    /* =========================================
+       RANK <select> HELPERS
+    ========================================= */
+
+    function populateRankSelect(gameSelectId, rankSelectId, includeAll) {
+        const game = document.getElementById(gameSelectId).value;
+        const rankSelect = document.getElementById(rankSelectId);
+        rankSelect.innerHTML = "";
+
+        if (includeAll) {
+            const allOpt = document.createElement("option");
+            allOpt.value = "all";
+            allOpt.textContent = "ทุกแรงค์";
+            rankSelect.appendChild(allOpt);
+        }
+
+        const list = (game === "all") ? [] : gameRanks[game];
+        list.forEach(function (r) {
+            const o = document.createElement("option");
+            o.value = r;
+            o.textContent = r;
+            rankSelect.appendChild(o);
+        });
+    }
+
+    function changeRank() { populateRankSelect("game", "rank", true); }
+    function changeRegRank() { populateRankSelect("regGame", "regRank", false); }
+    function changeProfileRank() { populateRankSelect("profGame", "profRank", false); }
+
+
+    /* =========================================
+       FIND / FILTER PLAYERS
+    ========================================= */
+
+    function applyFilters(shouldScroll) {
+        const game = document.getElementById("game").value;
+        const rank = document.getElementById("rank").value;
+        const style = document.getElementById("style").value;
+        const search = document.getElementById("searchName").value.trim().toLowerCase();
+
+        let results = players.filter(function (p) {
+            if (game !== "all" && p.gameKey !== game) return false;
+            if (rank !== "all" && p.rank !== rank) return false;
+            if (style !== "all" && p.style !== style) return false;
+            if (search && p.name.toLowerCase().indexOf(search) === -1) return false;
+            return true;
+        });
+
+        results.sort(function (a, b) { return b.match - a.match; });
+
+        renderPlayers(results);
+
+        const filterActive = game !== "all" || rank !== "all" || style !== "all" || search !== "";
+        document.getElementById("resetFiltersBtn").style.display = filterActive ? "inline-block" : "none";
+
+        const subtitle = document.getElementById("playersSubtitle");
+        subtitle.textContent = filterActive
+            ? "พบผู้เล่น " + results.length + " คนที่ตรงกับตัวกรองของคุณ"
+            : "ผู้เล่นที่มีเกมและ Rank ใกล้เคียงกับคุณ";
+
+        if (shouldScroll) {
+            document.getElementById("players").scrollIntoView({ behavior: "smooth" });
+        }
+    }
+
+    function findPlayers() { applyFilters(true); }
+
+    function resetFilters() {
+        document.getElementById("game").value = "all";
+        changeRank();
+        document.getElementById("style").value = "all";
+        document.getElementById("searchName").value = "";
+        applyFilters(false);
+    }
+
+    function renderPlayers(list) {
+        const grid = document.getElementById("playersGrid");
+
+        if (list.length === 0) {
+            grid.innerHTML =
+                '<div class="empty-state">' +
+                '<div style="font-size:40px;margin-bottom:10px;">🔍</div>' +
+                '<h3>ไม่พบผู้เล่นที่ตรงกับตัวกรอง</h3>' +
+                '<p>ลองเปลี่ยนเกม แรงค์ หรือสไตล์การเล่นดูนะ</p>' +
+                '</div>';
+            return;
+        }
+
+        grid.innerHTML = list.map(playerCardHTML).join("");
+    }
+
+    function playerCardHTML(p) {
+        const added = friendRequests.has(p.id);
+        const rIcon = rankEmoji[p.rank] || "🏅";
+        const sIcon = styleEmoji[p.style] || "🎯";
+        const badge = p.match >= 90 ? '<div class="great-match">🔥 Match ดีมาก</div>' : "";
+        const onlineLabel = p.online
+            ? '<div class="online">● Online</div>'
+            : '<div class="online" style="color:var(--text-muted);">○ Offline</div>';
+
+        return (
+            '<div class="player-card">' +
+            '<div class="player-top">' +
+            '<div class="player-avatar">' + p.avatar + '</div>' +
+            '<div><div class="player-name">' + p.name + '</div>' + onlineLabel + '</div>' +
+            '</div>' +
+            '<div class="game">🎮 ' + gameNames[p.gameKey] + '</div>' +
+            '<div class="rank">' + rIcon + ' ' + p.rank + '</div>' +
+            '<div class="style">' + sIcon + ' ' + p.style + '</div>' +
+            badge +
+            '<div class="match"><span>Match</span><span class="match-percent">' + p.match + '%</span></div>' +
+            '<button class="card-btn ' + (added ? "added" : "") + '" onclick="toggleFriend(' + p.id + ')">' +
+            (added ? "✓ Request Sent" : "+ Add Friend") +
+            '</button>' +
+            '</div>'
+        );
+    }
+
+    function toggleFriend(id) {
+        const p = players.find(function (pl) { return pl.id === id; });
+        if (!p) return;
+
+        if (friendRequests.has(id)) {
+            friendRequests.delete(id);
+            showToast("ยกเลิกคำขอเป็นเพื่อนกับ " + p.name + " แล้ว");
+        } else {
+            friendRequests.add(id);
+            showToast("ส่งคำขอเป็นเพื่อนให้ " + p.name + " แล้ว 🎮", "success");
+        }
+        applyFilters(false);
+    }
+
+
+    /* =========================================
+       CHAT
+    ========================================= */
+
+    function switchChat(key) {
+        activeChat = key;
+        renderChatList();
+        renderChatWindow();
+    }
+
+    function renderChatList() {
+        const list = document.getElementById("chatList");
+        list.innerHTML = Object.keys(chats).map(function (key) {
+            const c = chats[key];
+            const dot = c.online ? "🟢" : "⚪";
+            const activeClass = key === activeChat ? "active" : "";
+            return '<div class="chat-user ' + activeClass + '" onclick="switchChat(\'' + key + '\')">' + dot + ' ' + c.name + '</div>';
+        }).join("");
+    }
+
+    function renderChatWindow() {
+        const c = chats[activeChat];
+        document.getElementById("chatHeader").textContent = "💬 " + c.name + (c.online ? "" : " (ออฟไลน์)");
+
+        const msgs = document.getElementById("messages");
+        msgs.innerHTML = c.messages.map(function (m) {
+            return '<div class="message ' + (m.from === "me" ? "me" : "") + '">' + escapeHTML(m.text) + '</div>';
+        }).join("");
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const text = input.value.trim();
+        if (text === "") return;
+
+        const c = chats[activeChat];
+        c.messages.push({ from: "me", text: text });
+        input.value = "";
+        renderChatWindow();
+
+        showTyping();
+        const delay = 900 + Math.random() * 900;
+        const chatAtSendTime = activeChat;
+
+        setTimeout(function () {
+            hideTyping();
+            const reply = botReplies[Math.floor(Math.random() * botReplies.length)];
+            chats[chatAtSendTime].messages.push({ from: "them", text: reply });
+            if (activeChat === chatAtSendTime) renderChatWindow();
+        }, delay);
+    }
+
+    function showTyping() {
+        const msgs = document.getElementById("messages");
+        const typing = document.createElement("div");
+        typing.id = "typingIndicator";
+        typing.className = "typing";
+        typing.innerHTML = "<span></span><span></span><span></span>";
+        msgs.appendChild(typing);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function hideTyping() {
+        const t = document.getElementById("typingIndicator");
+        if (t) t.remove();
+    }
+
+
+    /* =========================================
+       MODALS
+    ========================================= */
+
+    function openModal(id) {
+        document.getElementById(id).classList.add("open");
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove("open");
+        document.body.style.overflow = "";
+    }
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+            document.querySelectorAll(".modal-overlay.open").forEach(function (m) { closeModal(m.id); });
+        }
+    });
+
+    window.addEventListener("click", function (e) {
+        if (!e.target.closest(".profile-chip-wrap")) {
+            const dd = document.getElementById("profileDropdown");
+            if (dd) dd.classList.remove("open");
+        }
+    });
+
+    function switchAuthTab(tab) {
+        document.getElementById("loginForm").style.display = tab === "login" ? "block" : "none";
+        document.getElementById("registerForm").style.display = tab === "register" ? "block" : "none";
+        document.getElementById("tabLogin").classList.toggle("active", tab === "login");
+        document.getElementById("tabRegister").classList.toggle("active", tab === "register");
+    }
+
+    function toggleProfileDropdown() {
+        document.getElementById("profileDropdown").classList.toggle("open");
+    }
+
+
+    /* =========================================
+       AUTH
+    ========================================= */
+
+    function handleLogin(e) {
+        e.preventDefault();
+        const username = document.getElementById("loginUsername").value.trim();
+        const password = document.getElementById("loginPassword").value;
+
+        // First try: use email as username (since API expects email)
+        apiCall("/auth/login", {
+            method: "POST",
+            body: JSON.stringify({ email: username, password })
+        })
+            .then(response => {
+                setToken(response.token);
+                
+                // Store user data
+                currentUser = {
+                    username: response.user.username,
+                    displayName: response.user.username,
+                    email: response.user.email,
+                    avatar: "🎮",
+                    game: "valorant",
+                    rank: "Diamond",
+                    style: "Casual",
+                    bio: ""
+                };
+
+                // Fetch full user profile
+                return apiCall("/users/" + response.user.id);
+            })
+            .then(user => {
+                currentUser = {
+                    id: user.id,
+                    username: user.username,
+                    displayName: user.username,
+                    email: user.email,
+                    avatar: user.avatar || "🎮",
+                    game: user.game || "valorant",
+                    rank: user.rank || "Diamond",
+                    style: user.play_style || "Casual",
+                    bio: user.bio || ""
+                };
+
+                document.getElementById("loginForm").reset();
+                closeModal("authModal");
+                updateAuthUI();
+                if (!socket) initSocket();
+                showToast("เข้าสู่ระบบสำเร็จ ยินดีต้อนรับ " + currentUser.displayName + " 👋", "success");
+            })
+            .catch(err => {
+                showToast("❌ " + err.message, "error");
+            });
+    }
+
+    function handleRegister(e) {
+        e.preventDefault();
+        const displayName = document.getElementById("regDisplayName").value.trim();
+        const username = document.getElementById("regUsername").value.trim();
+        const email = username + "@matchfound.local"; // Generate email from username
+        const password = document.getElementById("regPassword").value;
+        const game = document.getElementById("regGame").value;
+        const rank = document.getElementById("regRank").value;
+
+        if (!displayName || !username || !password || !rank) {
+            showToast("กรุณากรอกข้อมูลให้ครบ", "error");
+            return;
+        }
+
+        apiCall("/auth/register", {
+            method: "POST",
+            body: JSON.stringify({ username, email, password })
+        })
+            .then(response => {
+                setToken(response.token);
+                
+                // Update user profile with game/rank info
+                currentUser = {
+                    id: response.user.id,
+                    username: response.user.username,
+                    displayName: displayName,
+                    email: response.user.email,
+                    avatar: "🎮",
+                    game: game,
+                    rank: rank,
+                    style: "Casual",
+                    bio: ""
+                };
+
+                // Save profile to backend
+                return apiCall("/users/" + response.user.id, {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        game: game,
+                        rank: rank,
+                        avatar: "🎮",
+                        play_style: "Casual"
+                    })
+                });
+            })
+            .then(() => {
+                document.getElementById("registerForm").reset();
+                changeRegRank();
+                closeModal("authModal");
+                updateAuthUI();
+                if (!socket) initSocket();
+                showToast("สร้างบัญชีสำเร็จ ยินดีต้อนรับสู่ MATCHFOUND! 🎉", "success");
+            })
+            .catch(err => {
+                showToast("❌ " + err.message, "error");
+            });
+    }
+
+    function logout() {
+        currentUser = null;
+        updateAuthUI();
+        showToast("ออกจากระบบแล้ว");
+    }
+
+    function updateAuthUI() {
+        const desktop = document.getElementById("authArea");
+        const mobile = document.getElementById("mobileAuthArea");
+        const greeting = document.getElementById("heroGreeting");
+
+        if (currentUser) {
+            desktop.innerHTML =
+                '<div class="profile-chip-wrap">' +
+                '<button class="profile-chip" onclick="toggleProfileDropdown()">' +
+                '<span class="chip-avatar">' + currentUser.avatar + '</span>' +
+                '<span>' + currentUser.displayName + '</span>' +
+                '</button>' +
+                '<div id="profileDropdown" class="profile-dropdown">' +
+                '<button type="button" onclick="openProfileModal()">👤 โปรไฟล์</button>' +
+                '<button type="button" onclick="logout()">🚪 ออกจากระบบ</button>' +
+                '</div></div>';
+
+            mobile.innerHTML =
+                '<button type="button" class="login-btn" style="width:100%;" onclick="openProfileModal()">👤 ' + currentUser.displayName + '</button>' +
+                '<button type="button" class="reset-filters-btn" style="width:100%;" onclick="logout()">ออกจากระบบ</button>';
+
+            greeting.textContent = "ยินดีต้อนรับกลับมา, " + currentUser.displayName + " 👋";
+        } else {
+            desktop.innerHTML = '<button class="login-btn" onclick="openModal(\'authModal\')">Login</button>';
+            mobile.innerHTML = '<button type="button" class="login-btn" style="width:100%;" onclick="openModal(\'authModal\')">Login</button>';
+            greeting.textContent = defaultGreeting;
+        }
+    }
+
+
+    /* =========================================
+       PROFILE
+    ========================================= */
+
+    function openProfileModal() {
+        if (!currentUser) { openModal("authModal"); return; }
+
+        document.getElementById("profDisplayName").value = currentUser.displayName;
+        document.getElementById("profBio").value = currentUser.bio || "";
+        document.getElementById("profGame").value = currentUser.game;
+        changeProfileRank();
+        document.getElementById("profRank").value = currentUser.rank;
+        document.getElementById("profStyle").value = currentUser.style;
+
+        selectedAvatar = currentUser.avatar;
+        document.querySelectorAll(".avatar-option").forEach(function (btn) {
+            btn.classList.toggle("selected", btn.dataset.avatar === currentUser.avatar);
+        });
+
+        const dd = document.getElementById("profileDropdown");
+        if (dd) dd.classList.remove("open");
+
+        openModal("profileModal");
+    }
+
+    function selectAvatar(el) {
+        selectedAvatar = el.dataset.avatar;
+        document.querySelectorAll(".avatar-option").forEach(function (b) { b.classList.remove("selected"); });
+        el.classList.add("selected");
+    }
+
+    function handleProfileSave(e) {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        currentUser.displayName = document.getElementById("profDisplayName").value.trim() || currentUser.displayName;
+        currentUser.bio = document.getElementById("profBio").value.trim();
+        currentUser.game = document.getElementById("profGame").value;
+        currentUser.rank = document.getElementById("profRank").value;
+        currentUser.style = document.getElementById("profStyle").value;
+        currentUser.avatar = selectedAvatar;
+
+        const idx = users.findIndex(function (u) { return u.username === currentUser.username; });
+        if (idx > -1) users[idx] = currentUser;
+
+        updateAuthUI();
+        closeModal("profileModal");
+        showToast("บันทึกโปรไฟล์เรียบร้อยแล้ว ✅", "success");
+    }
+
+
+    /* =========================================
+       TOASTS
+    ========================================= */
+
+    function showToast(message, type) {
+        const container = document.getElementById("toastContainer");
+        const toast = document.createElement("div");
+        toast.className = "toast" + (type ? " " + type : "");
+        toast.textContent = message;
+        container.appendChild(toast);
+
+        setTimeout(function () {
+            toast.classList.add("hide");
+            setTimeout(function () { toast.remove(); }, 300);
+        }, 2600);
+    }
+
+
+    /* =========================================
+       INIT
+    ========================================= */
+
+    document.addEventListener("DOMContentLoaded", function () {
+        changeRank();
+        changeRegRank();
+        changeProfileRank();
+        applyFilters(false);
+        renderChatList();
+        renderChatWindow();
+        updateAuthUI();
+    });
+
+</script>
+
+</body>
+</html>
