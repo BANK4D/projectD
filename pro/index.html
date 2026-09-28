@@ -3,302 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VCT HUB | แหล่งรวมใจสายอีสปอร์ต</title>
-    <!-- Bootstrap 5 CSS & Icons -->
+    <title>VCT LIVE HUB | รายงานผลสด & ตารางแข่งขันทางการ</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="test.css">
 </head>
 <body>
 
-    <!-- Match Ticker (แถบรายงานผลแข่งขันสด) -->
+    <!-- Match Ticker (Real-time Live Scores) -->
     <div class="match-ticker py-2 text-white">
         <div class="container d-flex justify-content-between align-items-center flex-wrap">
             <div class="d-flex align-items-center gap-3">
                 <span class="badge bg-danger badge-live"><i class="bi bi-broadcast"></i> LIVE</span>
-                <span class="fw-bold text-uppercase">VCT Pacific: PRX vs SEN</span>
-                <span class="text-secondary">( Map 2: Bind - 11 : 9 )</span>
+                <span id="ticker-match" class="fw-bold text-uppercase">VCT Pacific: PRX vs GEN.G</span>
+                <span id="ticker-score" class="text-warning fw-bold">(Map 2: Sunset | PRX 10 - 8 GEN)</span>
             </div>
-            <div class="d-none d-md-flex align-items-center gap-4 text-secondary">
-                <span><i class="bi bi-clock"></i> ถัดไป: FNC vs GEN.G (03:00 PM)</span>
-                <a href="#" class="text-danger fw-bold text-decoration-none"><i class="bi bi-play-circle"></i> รับชมสด</a>
+            <div class="d-none d-md-flex align-items-center gap-3 text-secondary">
+                <span><i class="bi bi-clock"></i> คู่ถัดไป: FNC vs TH (21:00 น.)</span>
+                <span class="badge bg-dark border border-secondary text-secondary">ข้อมูลสด: Riot Official</span>
             </div>
         </div>
     </div>
 
-    <!-- Navbar -->
+    <!-- Navbar (อัปเดตลบ News ออก เหลือ 3 หน้าหลัก) -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top py-3">
         <div class="container">
-            <a class="navbar-brand fw-bold fs-3 text-white" href="index.html">VCT <span class="text-danger">HUB</span></a>
+            <a class="navbar-brand fw-bold fs-3 text-white" href="index.html">VCT <span class="text-danger">LIVE</span></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="index.html">หน้าแรก</a></li>
-                    <li class="nav-item"><a class="nav-link" href="teams.html">ทีมแข่งขัน</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contact.html">สมัครแข่ง/ติดต่อ</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="index.html">ตารางแข่ง & ผลสด</a></li>
+                    <li class="nav-item"><a class="nav-link" href="team.html">สโมสร & อุปกรณ์โปร</a></li>
+                    <li class="nav-item"><a class="nav-link" href="standings.html">ตารางคะแนน</a></li>
                 </ul>
-                <a href="contact.html" class="btn btn-vct"><i class="bi bi-controller"></i> JOIN NOW</a>
+                <button id="btn-request-noti" class="btn btn-outline-danger btn-sm px-3">
+                    <i class="bi bi-bell-fill"></i> เปิดแจ้งเตือนแมตช์สำคัญ
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Notification Permission Alert Banner -->
+    <div id="noti-banner" class="bg-dark border-bottom border-danger py-2 text-center text-white d-none">
+        <div class="container d-flex justify-content-center align-items-center gap-3 flex-wrap">
+            <small><i class="bi bi-info-circle text-danger"></i> ไม่พลาดทุกจังหวะสำคัญ เปิดการแจ้งเตือนเพื่อรับผลแข่ง</small>
+            <button class="btn btn-vct btn-sm py-1 px-3" onclick="enableNotification()"><i class="bi bi-check2-circle"></i> ยินยอม</button>
+            <button class="btn btn-secondary btn-sm py-1 px-2" onclick="dismissBanner()">ไว้ทีหลัง</button>
+        </div>
+    </div>
+
+    <!-- Header Section -->
     <header class="hero-section text-center">
         <div class="container py-5">
-            <span class="badge badge-vct px-3 py-2 mb-3 text-uppercase fw-bold"><i class="bi bi-fire"></i> Global Championship 2026</span>
-            <h1 class="display-2 fw-extrabold text-white mb-3">VALORANT CHAMPIONS TOUR 2026</h1>
-            <p class="lead text-secondary mx-auto" style="max-width: 700px;">ศึกเกียรติยศระดับโลกของเหล่าแชมเปียนส์ ร่วมเชียร์ทีมโปรดของคุณในรายการที่ร้อนแรงที่สุดในปีนี้</p>
-            <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
-                <a href="team.html" class="btn btn-vct btn-lg"><i class="bi bi-people-fill"></i> ดูทีมที่ร่วมศึก</a>
-                <a href="#matches" class="btn btn-outline-light btn-lg px-4"><i class="bi bi-play-circle"></i> ดูตารางแข่ง</a>
-            </div>
+            <span class="badge badge-vct px-3 py-2 mb-3 text-uppercase fw-bold"><i class="bi bi-shield-check"></i> Official Match Center 2026</span>
+            <h1 class="display-3 fw-bold text-white mb-3">VALORANT TOURNAMENT TRACKER</h1>
+            <p class="lead text-secondary mx-auto" style="max-width: 720px;">
+                ติดตามการแข่งขัน ผลการแข่งแบบวินาทีต่อวินาที ตารางถ่ายทอดสด และสถิติทางการของทุกทีมชั้นนำในลีก VCT
+            </p>
         </div>
     </header>
 
-    <!-- Upcoming Matches Section -->
-    <section id="matches" class="matches-section py-5">
-        <div class="container">
-            <h2 class="fw-bold mb-4 text-white"><span class="text-danger">|</span> ตารางการแข่งขันจากเว็บทางการ</h2>
-            <p class="text-secondary mb-4"><i class="bi bi-info-circle"></i> ข้อมูลสดจาก valorantesports.com</p>
-            <div class="matches-grid">
-                <!-- Match 1 -->
-                <div class="match-card">
-                    <div class="match-status"><i class="bi bi-play-circle"></i> VCT PACIFIC</div>
-                    <div class="match-time">วันศุกร์ 28 ส.ค.</div>
-                    <div class="match-content">
-                        <div class="team team-1">
-                            <div class="team-logo">ONG</div>
-                            <span>ONSIDE</span>
-                        </div>
-                        <div class="vs">VS</div>
-                        <div class="team team-2">
-                            <span>Paper Rex</span>
-                            <div class="team-logo">PRX</div>
-                        </div>
-                    </div>
-                    <div class="match-league">
-                        <a href="https://valorantesports.com/th-TH/vod/115581280955044705/1" target="_blank" class="text-danger text-decoration-none">
-                            <i class="bi bi-play"></i> รับชม
-                        </a>
-                    </div>
-                </div>
-                <!-- Match 2 -->
-                <div class="match-card">
-                    <div class="match-status"><i class="bi bi-clock-history"></i> VCT PACIFIC</div>
-                    <div class="match-time">วันศุกร์ 28 ส.ค.</div>
-                    <div class="match-content">
-                        <div class="team team-1">
-                            <div class="team-logo">T1</div>
-                            <span>T1</span>
-                        </div>
-                        <div class="vs">VS</div>
-                        <div class="team team-2">
-                            <span>Kiwoom DRX</span>
-                            <div class="team-logo">KRX</div>
-                        </div>
-                    </div>
-                    <div class="match-league">
-                        <a href="https://valorantesports.com/th-TH/vod/115581280955044709/1" target="_blank" class="text-danger text-decoration-none">
-                            <i class="bi bi-play"></i> รับชม
-                        </a>
-                    </div>
-                </div>
-                <!-- Match 3 -->
-                <div class="match-card">
-                    <div class="match-status"><i class="bi bi-calendar3"></i> VCT AMERICAS</div>
-                    <div class="match-time">วันเสาร์ 29 ส.ค.</div>
-                    <div class="match-content">
-                        <div class="team team-1">
-                            <div class="team-logo">NRG</div>
-                            <span>NRG</span>
-                        </div>
-                        <div class="vs">VS</div>
-                        <div class="team team-2">
-                            <span>LOUD</span>
-                            <div class="team-logo">LOUD</div>
-                        </div>
-                    </div>
-                    <div class="match-league">
-                        <a href="https://valorantesports.com/th-TH/vod/115581239610515760/1" target="_blank" class="text-danger text-decoration-none">
-                            <i class="bi bi-play"></i> รับชม
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Content (News Section) -->
-    <main id="news" class="container mt-5 py-4">
+    <!-- Live & Upcoming Matches -->
+    <main class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0 text-white"><span class="text-danger">|</span> ข่าวสารและไฮไลท์</h2>
-            <button class="text-danger text-decoration-none fw-bold border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#allNewsModal">ทั้งหมด <i class="bi bi-arrow-right"></i></button>
+            <h2 class="fw-bold text-white mb-0"><span class="text-danger">|</span> แมตช์ที่กำลังแข่งขัน & คู่ถัดไป</h2>
+            <span class="badge bg-dark border border-danger text-danger p-2"><i class="bi bi-arrow-repeat"></i> ซิงค์อัตโนมัติทุก 15 วินาที</span>
         </div>
-        
-        <div class="row g-4">
-            <!-- News Card 1 -->
-            <div class="col-md-4">
-                <div class="card vct-card h-100 text-white border-0 news-card" role="button" data-bs-toggle="modal" data-bs-target="#newsModal1" style="cursor: pointer;">
-                    <div class="position-relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop" class="card-img-top" alt="Champion Trophy">
-                        <span class="position-absolute top-0 start-0 m-3 badge bg-danger text-uppercase fw-bold">Tournament</span>
+
+        <div class="row g-4" id="live-match-container">
+            <!-- Live Match Card -->
+            <div class="col-lg-6">
+                <div class="card vct-card border-danger h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-danger badge-live"><i class="bi bi-record-circle"></i> กำลังแข่ง (LIVE)</span>
+                        <small class="text-secondary">VCT Pacific Stage 2 • Bo3</small>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">สรุปผลการแข่งศึกเวิลด์ทัวร์</h5>
-                        <p class="card-text text-secondary">เผยโฉมหน้าแชมป์สุดยอดฟอร์มโหดจากนัดชิงชนะเลิศที่สู้ดุเดือดครบ 5 แผนที่!</p>
-                        <hr class="border-secondary opacity-25">
-                        <small class="text-secondary"><i class="bi bi-calendar3"></i> 2 ชั่วโมงที่ผ่านมา</small>
+                    <div class="row align-items-center text-center my-3">
+                        <div class="col-5">
+                            <h4 class="fw-bold text-white mb-1">Paper Rex</h4>
+                            <span class="badge bg-dark border border-secondary text-secondary">Pacific</span>
+                        </div>
+                        <div class="col-2">
+                            <div class="fs-2 fw-bold text-danger" id="live-score">1 - 0</div>
+                            <small class="text-secondary d-block">Map 2 (Bind)</small>
+                        </div>
+                        <div class="col-5">
+                            <h4 class="fw-bold text-white mb-1">Gen.G</h4>
+                            <span class="badge bg-dark border border-secondary text-secondary">Pacific</span>
+                        </div>
+                    </div>
+                    <div class="bg-black p-3 rounded text-center border border-dark mt-3">
+                        <span class="text-secondary small">รอบปัจจุบัน: </span>
+                        <strong class="text-warning" id="live-round-info">PRX 10 : 8 GEN (Attackers Defusing)</strong>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <a href="https://valorantesports.com" target="_blank" class="btn btn-vct w-100">
+                            <i class="bi bi-play-circle-fill"></i> ชมสดผ่าน Official Stream
+                        </a>
                     </div>
                 </div>
             </div>
-            <!-- News Card 2 -->
-            <div class="col-md-4">
-                <div class="card vct-card h-100 text-white border-0 news-card" role="button" data-bs-toggle="modal" data-bs-target="#newsModal2" style="cursor: pointer;">
-                    <div class="position-relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1552824722-ddab1374e60e?q=80&w=600&auto=format&fit=crop" class="card-img-top" alt="New Agent Update">
-                        <span class="position-absolute top-0 start-0 m-3 badge bg-danger text-uppercase fw-bold">Update</span>
+
+            <!-- Upcoming Match Card -->
+            <div class="col-lg-6">
+                <div class="card vct-card h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-secondary"><i class="bi bi-clock"></i> เร็วๆ นี้ (Upcoming)</span>
+                        <small class="text-secondary">เวลา 21:00 น. วันนี้</small>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">เจาะลึก เอเจนต์ใหม่ล่าสุด</h5>
-                        <p class="card-text text-secondary">เปิดตัวสกิลความสามารถสุดแหวกแนวที่จะเข้ามาเปลี่ยนเมต้าการเล่นไปตลอดกาล</p>
-                        <hr class="border-secondary opacity-25">
-                        <small class="text-secondary"><i class="bi bi-calendar3"></i> 1 วันที่ผ่านมา</small>
+                    <div class="row align-items-center text-center my-3">
+                        <div class="col-5">
+                            <h4 class="fw-bold text-white mb-1">Fnatic</h4>
+                            <span class="badge bg-dark border border-secondary text-secondary">EMEA</span>
+                        </div>
+                        <div class="col-2">
+                            <span class="badge bg-dark text-danger fs-5 px-3 py-2">VS</span>
+                        </div>
+                        <div class="col-5">
+                            <h4 class="fw-bold text-white mb-1">Team Heretics</h4>
+                            <span class="badge bg-dark border border-secondary text-secondary">EMEA</span>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <!-- News Card 3 -->
-            <div class="col-md-4">
-                <div class="card vct-card h-100 text-white border-0 news-card" role="button" data-bs-toggle="modal" data-bs-target="#newsModal3" style="cursor: pointer;">
-                    <div class="position-relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1603481588273-2f908a9a7a1b?q=80&w=600&auto=format&fit=crop" class="card-img-top" alt="Gaming Hardware">
-                        <span class="position-absolute top-0 start-0 m-3 badge bg-danger text-uppercase fw-bold">Guide</span>
+                    <div class="bg-black p-3 rounded text-center border border-dark mt-3">
+                        <span class="text-secondary small">รายการ: </span>
+                        <strong class="text-light">VCT Masters Grand Final • Bo5</strong>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">เผยความลับ! ตั้งค่าระดับโปร</h5>
-                        <p class="card-text text-secondary">รวบรวมรหัสเป้าเล็ง (Crosshair) และความไวเมาส์ (Sens) ของเหล่า Pro Player ในทัวร์นาเมนต์นี้</p>
-                        <hr class="border-secondary opacity-25">
-                        <small class="text-secondary"><i class="bi bi-calendar3"></i> 3 วันที่ผ่านมา</small>
+                    <div class="mt-3">
+                        <button class="btn btn-outline-danger w-100" onclick="scheduleNotification('Fnatic vs Team Heretics', '21:00 น.')">
+                            <i class="bi bi-alarm-fill"></i> ตั้งเตือนเมื่อคู่นี้เริ่มแข่ง
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- News Modal 1 -->
-    <div class="modal fade" id="newsModal1" tabindex="-1" aria-labelledby="newsModal1Label" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-danger">
-                <div class="modal-header border-danger">
-                    <h5 class="modal-title text-danger fw-bold" id="newsModal1Label"><i class="bi bi-fire"></i> สรุปผลการแข่งศึกเวิลด์ทัวร์</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop" class="img-fluid rounded mb-3" alt="Champion Trophy">
-                    <span class="badge bg-danger mb-3">TOURNAMENT</span>
-                    <p>เผยโฉมหน้าแชมป์สุดยอดฟอร์มโหดจากนัดชิงชนะเลิศที่สู้ดุเดือดครบ 5 แผนที่ใจเต้นระเหวดกับทุกแผนที่ที่เต็มไปด้วยความตึงเครียดและกลยุทธ์ที่ยอดเยี่ยม!</p>
-                    <p class="text-secondary"><i class="bi bi-calendar3"></i> 2 ชั่วโมงที่ผ่านมา</p>
-                    <p class="text-secondary"><strong>แหล่งข้อมูล:</strong> VCT Official Channel</p>
-                </div>
-                <div class="modal-footer border-danger">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                    <a href="#" class="btn btn-vct"><i class="bi bi-play-circle"></i> ดูรายละเอียดเพิ่มเติม</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- News Modal 2 -->
-    <div class="modal fade" id="newsModal2" tabindex="-1" aria-labelledby="newsModal2Label" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-danger">
-                <div class="modal-header border-danger">
-                    <h5 class="modal-title text-danger fw-bold" id="newsModal2Label"><i class="bi bi-lightning-fill"></i> เจาะลึก เอเจนต์ใหม่ล่าสุด</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <img src="https://images.unsplash.com/photo-1552824722-ddab1374e60e?q=80&w=600&auto=format&fit=crop" class="img-fluid rounded mb-3" alt="New Agent Update">
-                    <span class="badge bg-danger mb-3">UPDATE</span>
-                    <p>เปิดตัวสกิลความสามารถสุดแหวกแนวที่จะเข้ามาเปลี่ยนเมต้าการเล่นไปตลอดกาล ด้วยความสามารถที่เป็นเอกลักษณ์และสนองตอบความต้องการของเกมเมอร์ที่กำลังมองหาสไตล์การเล่นใหม่!</p>
-                    <p class="text-secondary"><i class="bi bi-calendar3"></i> 1 วันที่ผ่านมา</p>
-                    <p class="text-secondary"><strong>แหล่งข้อมูล:</strong> Riot Games Official</p>
-                </div>
-                <div class="modal-footer border-danger">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                    <a href="#" class="btn btn-vct"><i class="bi bi-play-circle"></i> ดูรายละเอียดเพิ่มเติม</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- News Modal 3 -->
-    <div class="modal fade" id="newsModal3" tabindex="-1" aria-labelledby="newsModal3Label" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-danger">
-                <div class="modal-header border-danger">
-                    <h5 class="modal-title text-danger fw-bold" id="newsModal3Label"><i class="bi bi-gear"></i> เผยความลับ! ตั้งค่าระดับโปร</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <img src="https://images.unsplash.com/photo-1603481588273-2f908a9a7a1b?q=80&w=600&auto=format&fit=crop" class="img-fluid rounded mb-3" alt="Gaming Hardware">
-                    <span class="badge bg-danger mb-3">GUIDE</span>
-                    <p>รวบรวมรหัสเป้าเล็ง (Crosshair) และความไวเมาส์ (Sens) ของเหล่า Pro Player ในทัวร์นาเมนต์นี้ เพื่อช่วยให้คุณปรับปรุงการเล่นของตัวเองและเข้าใกล้ระดับของ Pro Players!</p>
-                    <p class="text-secondary"><i class="bi bi-calendar3"></i> 3 วันที่ผ่านมา</p>
-                    <p class="text-secondary"><strong>แหล่งข้อมูล:</strong> VCT Pro Settings Database</p>
-                </div>
-                <div class="modal-footer border-danger">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                    <a href="#" class="btn btn-vct"><i class="bi bi-download"></i> ดาวน์โหลด Settings</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- All News Modal -->
-    <div class="modal fade" id="allNewsModal" tabindex="-1" aria-labelledby="allNewsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-danger">
-                <div class="modal-header border-danger">
-                    <h5 class="modal-title text-danger fw-bold" id="allNewsModalLabel"><i class="bi bi-newspaper"></i> ข่าวสารทั้งหมด</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="list-group list-group-flush">
-                        <button class="list-group-item list-group-item-action bg-dark text-white border-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#newsModal1">
-                            <h6 class="text-danger mb-1">สรุปผลการแข่งศึกเวิลด์ทัวร์</h6>
-                            <small class="text-secondary">2 ชั่วโมงที่ผ่านมา</small>
-                        </button>
-                        <button class="list-group-item list-group-item-action bg-dark text-white border-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#newsModal2">
-                            <h6 class="text-danger mb-1">เจาะลึก เอเจนต์ใหม่ล่าสุด</h6>
-                            <small class="text-secondary">1 วันที่ผ่านมา</small>
-                        </button>
-                        <button class="list-group-item list-group-item-action bg-dark text-white border-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#newsModal3">
-                            <h6 class="text-danger mb-1">เผยความลับ! ตั้งค่าระดับโปร</h6>
-                            <small class="text-secondary">3 วันที่ผ่านมา</small>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Footer -->
-    <footer class="bg-black text-secondary py-5 mt-5 border-top border-dark">
-        <div class="container text-center">
-            <h3 class="fw-bold text-white mb-3">VCT <span class="text-danger">HUB</span></h3>
-            <p class="mb-4">เว็บไซต์คอมมูนิตี้สำหรับติดตามข้อมูลทัวร์นาเมนต์และทีม Esports</p>
-            <div class="d-flex justify-content-center gap-3 mb-4 fs-4">
-                <a href="#" class="text-secondary hover:text-white"><i class="bi bi-facebook text-white"></i></a>
-                <a href="#" class="text-secondary hover:text-white"><i class="bi bi-youtube text-danger"></i></a>
-                <a href="#" class="text-secondary hover:text-white"><i class="bi bi-twitter-x text-white"></i></a>
-                <a href="#" class="text-secondary hover:text-white"><i class="bi bi-discord text-info"></i></a>
-            </div>
-            <p class="small mb-0">&copy; 2026 VCT Hub. จัดทำเพื่อการศึกษา - Assignment 4</p>
+    <footer class="bg-black text-secondary py-4 border-top border-dark text-center mt-5">
+        <div class="container">
+            <h4 class="text-white fw-bold">VCT <span class="text-danger">LIVE</span></h4>
+            <p class="small text-secondary mb-0">Assignment 4 My Interest Website</p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
